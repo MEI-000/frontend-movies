@@ -1,10 +1,17 @@
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { movieApi } from '../constants/axios'
+import { userRequests } from '../constants/requests'
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import useAppStateContext from '../hooks/useAppStateContext'
 
 const RegisterForm = () => {
+  const { dispatch } = useAppStateContext()
   const [showPass, setShowPass] = useState(false)
   const [message, setMessage] = useState("")
+
+  const navigate = useNavigate()
 
   const [user, setUser] = useState({
     email: "",
@@ -20,9 +27,42 @@ const RegisterForm = () => {
     setShowPass(!showPass)
   }
 
+  const registration = (event) => {
+    event.preventDefault();
+
+    if (!user.email || !user.password) {
+      setMessage("Please fill all required fields")
+    } else {
+      movieApi.post(userRequests.register, user)
+        .then((response) => {
+          console.log(response)
+          dispatch({
+            type: "register"
+          })
+          navigate("/home")
+        }).catch((error) => {
+          setMessage(error.response.data.message)
+        })
+    }
+  }
+
 
   return (
     <React.Fragment>
+      <div className='inputs-container'>
+        <div className='input-container'>
+          <label className='userName'>User Name</label>
+          <input
+            type='text'
+            className='userName'
+            onChange={(e) => setUser({
+              ...user,
+              username: e.target.value
+            })}
+          >
+          </input>
+        </div>
+      </div>
       <div className='inputs-container'>
         <div className='input-container'>
           <label className='email'>Email</label>
@@ -61,14 +101,20 @@ const RegisterForm = () => {
       <div className='inputs-container'>
         <div className='input-container'>
           <label className='city'>City</label>
-          <input type="text" className='city'></input>
+          <input type="text" className='city' onChange={(e) => setUser({
+            ...user,
+            city: e.target.value
+          })}></input>
         </div>
         <div className='input-container'>
           <label className='street'>Street</label>
-          <input type="text" className='street'></input>
+          <input type="text" className='street' onChange={(e) => setUser({
+            ...user,
+            street: e.target.value
+          })}></input>
         </div>
       </div>
-      <button className='submit'>
+      <button className='submit' onClick={(e) => registration(e)}>
         submit
       </button>
       <span style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>

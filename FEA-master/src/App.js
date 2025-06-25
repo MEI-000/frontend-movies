@@ -6,10 +6,19 @@ import MovieDetailsPage from "./pages/MovieDetailsPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import PublicRoute from "./routes/PublicRoute"
 import PrivateRoute from "./routes/PrivateRoute"
-
+import useAppStateContext from "./hooks/useAppStateContext";
+import { useEffect } from "react";
+import Navbar from "./components/Navbar";
 const App = () => {
+  const { appState } = useAppStateContext();
+
+  useEffect(() => {
+    document.body.setAttribute("data-theme", appState.theme);
+  }, [appState.theme]);
+
   return (
     <>
+      <Navbar />
       <Routes>
         <Route element={<PublicRoute />}>
           <Route path="/login" element={<LoginPage />} />
